@@ -33,8 +33,8 @@ Backend multiusuario con autenticación JWT y autorización por recurso. Impleme
 1. **Clonar el repositorio**
 
    ```bash
-   git clone <url-del-repositorio>
-   cd backend
+   git clone https://github.com/DanyelHdz1231/backend-nodejs
+   cd backend-nodejs
    ```
 
 2. **Instalar dependencias**
