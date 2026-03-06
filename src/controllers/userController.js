@@ -32,30 +32,3 @@ exports.getUsers = async (req, res, next) => {
     next(error);
   }
 };
-
-exports.getUsersOrders = async (req, res, next) => {
-  try {
-    const userId = parseInt(req.params.id);
-
-    if (isNaN(userId) || userId < 1) {
-      const error = new Error("ID inválido");
-      error.status = 400;
-      return next(error);
-    }
-
-    const orders = await userService.getUserOrders(userId);
-
-    res.status(200).json(orders);
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.getTopSpenders = async (req, res, next) => {
-  try {
-    const topSpenders = await userService.getTopSpenders();
-    res.status(200).json(topSpenders);
-  } catch (error) {
-    next(error);
-  }
-};

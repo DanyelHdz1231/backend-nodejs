@@ -1,7 +1,7 @@
 {
-  "name": "nueva-carpeta",
+  "name": "backend-nodejs-tasks",
   "version": "1.0.0",
-  "description": "Backend multiusuario con autenticación JWT y autorización por recurso",
+  "description": "Backend multiusuario con autenticación JWT y gestión de tareas",
   "main": "src/app.js",
   "scripts": {
     "start": "node src/app.js",

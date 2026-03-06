@@ -61,3 +61,18 @@ exports.login = async ({ email, password }) => {
 
   return { token };
 };
+
+exports.Me = async (userId) => {
+  const [rows] = await pool.query(
+    `
+    SELECT id, name, email, created_at FROM users WHERE id = ?`,
+    [userId],
+  );
+
+  if (rows.length === 0) {
+    const error = new Error("Usuario no encontrado");
+    error.status = 404;
+    throw error;
+  }
+  return rows[0];
+};

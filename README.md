@@ -14,11 +14,14 @@ Backend multiusuario con autenticación JWT y autorización por recurso. Impleme
 
 - ✅ Sistema de autenticación con JWT
 - ✅ Registro y login de usuarios
+- ✅ Endpoint /auth/me para obtener información del usuario autenticado
 - ✅ CRUD completo de tareas con aislamiento por usuario
+- ✅ Filtrado de tareas por estado (completadas/pendientes)
+- ✅ Paginación en tareas y usuarios
 - ✅ Protección de rutas con middleware de autenticación
 - ✅ Gestión de usuarios con paginación
 - ✅ Manejo centralizado de errores
-- ✅ Validaciones de entrada
+- ✅ Validaciones de entrada (email formato, contraseña mínimo 6 caracteres)
 - ✅ Queries parametrizadas (prevención de SQL injection)
 
 ## 🛠️ Instalación
@@ -143,6 +146,24 @@ Content-Type: application/json
 }
 ```
 
+#### Obtener información del usuario autenticado
+
+```http
+GET /auth/me
+Authorization: Bearer <token>
+```
+
+**Respuesta exitosa (200):**
+
+```json
+{
+  "id": 1,
+  "name": "Juan Pérez",
+  "email": "juan@example.com",
+  "created_at": "2026-03-02T10:00:00.000Z"
+}
+```
+
 ### Tareas (requieren autenticación)
 
 Todas las rutas de tareas requieren el header de autorización:
@@ -154,21 +175,35 @@ Authorization: Bearer <tu_token_jwt>
 #### Obtener todas las tareas del usuario
 
 ```http
-GET /tasks
+GET /tasks?page=1&limit=10&completed=true
 Authorization: Bearer <token>
 ```
+
+**Parámetros de query (opcionales):**
+
+- `page` - Número de página (default: 1)
+- `limit` - Elementos por página (default: 10, max: 100)
+- `completed` - Filtrar por estado: `true` o `false`
 
 **Respuesta (200):**
 
 ```json
-[
-  {
-    "id": 1,
-    "text": "Aprender Node.js",
-    "completed": false,
-    "created_at": "2026-03-02T10:00:00.000Z"
+{
+  "data": [
+    {
+      "id": 1,
+      "text": "Aprender Node.js",
+      "completed": false,
+      "created_at": "2026-03-02T10:00:00.000Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "totalItems": 1,
+    "totalPages": 1
   }
-]
+}
 ```
 
 #### Crear una tarea
@@ -221,6 +256,29 @@ Authorization: Bearer <token>
 }
 ```
 
+#### Actualizar texto de una tarea
+
+```http
+PATCH /tasks/:id
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "text": "Aprender Node.js y Express"
+}
+```
+
+**Respuesta (200):**
+
+```json
+{
+  "id": 1,
+  "text": "Aprender Node.js y Express",
+  "completed": false,
+  "created_at": "2026-03-02T10:00:00.000Z"
+}
+```
+
 ### Usuarios
 
 #### Obtener todos los usuarios (con paginación)
@@ -248,18 +306,6 @@ GET /users?page=1&limit=10
     "totalPages": 1
   }
 }
-```
-
-#### Obtener top 5 usuarios con más gasto
-
-```http
-GET /users/top-spenders
-```
-
-#### Obtener órdenes de un usuario
-
-```http
-GET /users/:id/orders
 ```
 
 ## 🔐 Autenticación
@@ -327,29 +373,31 @@ src/
 
 ## 🐛 Códigos de Error
 
-| Código | Descripción                                |
-| ------ | ------------------------------------------ |
-| 400    | Bad Request - Datos de entrada inválidos   |
-| 401    | Unauthorized - Token inválido o faltante   |
-| 404    | Not Found - Recurso no encontrado          |
-| 500    | Internal Server Error - Error del servidor |
+| Código | Descripción                                | Ejemplos                                                       |
+| ------ | ------------------------------------------ | -------------------------------------------------------------- |
+| 400    | Bad Request - Datos de entrada inválidos   | Email inválido, contraseña muy corta, texto vacío, ID inválido |
+| 401    | Unauthorized - Token inválido o faltante   | Token expirado, credenciales incorrectas                       |
+| 404    | Not Found - Recurso no encontrado          | Tarea no existe, usuario no encontrado                         |
+| 500    | Internal Server Error - Error del servidor | Error de base de datos, error inesperado                       |
 
 ## 📝 Notas
 
 - Los tokens JWT expiran en 1 hora
 - El límite de paginación máximo es 100 elementos
-- Las contraseñas deben ser no vacías (se recomienda implementar validación más robusta)
+- Las contraseñas deben tener al menos 6 caracteres
+- Se valida el formato de email con expresión regular
 - El proyecto usa CommonJS (`require`/`module.exports`)
 
 ## 🚧 Mejoras Futuras
 
 - [ ] Implementar refresh tokens
-- [ ] Agregar validación de formato de email
-- [ ] Agregar requisitos de complejidad para contraseñas
+- [ ] Agregar requisitos de complejidad para contraseñas (mayúsculas, números, símbolos)
 - [ ] Implementar rate limiting
 - [ ] Agregar tests unitarios e integración
 - [ ] Documentación con Swagger/OpenAPI
 - [ ] Logs estructurados
+- [ ] Agregar endpoint para cambiar contraseña
+- [ ] Implementar recuperación de contraseña por email
 
 ## 📄 Licencia
 
